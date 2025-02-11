@@ -17,6 +17,11 @@ async def create_item(item: Item):
     items.append(item)
     return item
 
+# Read all items
+@app.get("/items/", response_model=list[Item])
+async def read_items():
+    return items
+
 @app.get("/items/{item_id}", response_model=Item)
 async def read_item(item_id: int):
     if item_id < 0 or item_id >= len(items):
