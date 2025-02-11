@@ -1,38 +1,33 @@
 from fastapi import FastAPI, HTTPException
+from post import Post, create_post, get_posts, get_post, update_post, delete_post
 
 app = FastAPI()
 
-# Create an item
-@app.post("/items/", response_model=Item)
-async def create_item(item: Item):
-    items.append(item)
-    return item
+@app.post("/posts/", response_model=Post)
+async def store_post(post: Post):
+    create_post(post)
+    return post
 
-# Read all items
-@app.get("/items/", response_model=list[Item])
-async def read_items():
-    return items
+@app.get("/posts/", response_model=list[Post])
+async def read_posts():
+    posts = get_posts()
+    if len(posts) == 0:
+        raise HTTPException(status_code=404, detail="No posts found")
+    return posts
 
-@app.get("/items/{item_id}", response_model=Item)
-async def read_item(item_id: int):
-    if item_id < 0 or item_id >= len(items):
-        raise HTTPException(status_code=404, detail="Item not found")
-    return items[item_id]
+@app.get("/posts/{post_id}", response_model=Post)
+async def read_post(post_id: int):
+    post = get_post(post_id)
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    return post
 
-# Update an item
-@app.put("/items/{item_id}", response_model=Item)
-async def update_item(item_id: int, item: Item):
-    if item_id < 0 or item_id >= len(items):
-        raise HTTPException(status_code=404, detail="Item not found")
-    
-    items[item_id] = item
-    return 
+@app.put("/posts/{post_id}", response_model=Post)
+async def update_post(post_id: int, post: Post):
+    update_post(post_id, post)
+    return post
 
-# Delete an item
-@app.delete("/items/{item_id}", response_model=Item)
-async def delete_item(item_id: int):
-    if item_id < 0 or item_id >= len(items):
-        raise HTTPException(status_code=404, detail="Item not found")
-    
-    deleted_item = items.pop(item_id)
-    return deleted_item
+@app.delete("/posts/{post_id}", response_model=Post)
+async def delete_post(post_id: int):
+    delete_post(post_id)
+    return "Post deleted successfully"

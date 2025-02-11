@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 import pymysql
+from datetime import datetime
 
 class Post(BaseModel):
     id: int
@@ -14,18 +15,43 @@ class Post(BaseModel):
     cost: float
     licenses: str
     tags: str
-    reaction1: str
-    reaction2: str
-    reaction3: str
-    reaction4: str
-    reaction5: str
+    reaction1: int
+    reaction2: int
+    reaction3: int
+    reaction4: int
+    reaction5: int
     status: int
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
+
+    @staticmethod
+    def store(row):
+        return Post(
+            id=row[0],
+            user=row[1],
+            title=row[2],
+            body=row[3],
+            song=row[4],
+            photo=row[5],
+            bpm=row[6],
+            scale=row[7],
+            PaidMethods=row[8],
+            cost=row[9],
+            licenses=row[10],
+            tags=row[11],
+            reaction1=row[12],
+            reaction2=row[13],
+            reaction3=row[14],
+            reaction4=row[15],
+            reaction5=row[16],
+            status=row[17],
+            created_at=row[18],
+            updated_at=row[19]
+        )
 
 def execute_query(query, get=True):
     try:
-        connection = pymysql.connect(host='localhost', user='root', password='root', database='$0p0rt3')
+        connection = pymysql.connect(host='localhost', user='root', password='$0p0rt3', database='laravel')
         cursor = connection.cursor()
         cursor.execute(query)
         if get:
@@ -35,15 +61,22 @@ def execute_query(query, get=True):
             return True
     except Exception as e:
         print(e)
-        return False
-    
+        if get:
+            return []
+        else:
+            return False
+
 def get_posts():
     query = "SELECT * FROM posts"
-    return execute_query(query)
+    results = execute_query(query)
+    return [Post.store(row) for row in results]
 
 def get_post(id):
     query = f"SELECT * FROM posts WHERE id = {id}"
-    return execute_query(query)
+    result = execute_query(query)
+    if result:
+        return Post.store(result[0])
+    return None
 
 def create_post(post: Post):
     query = f"INSERT INTO posts (user, title, body, song, photo, bpm, scale, PaidMethods, cost, licenses, tags, reaction1, reaction2, reaction3, reaction4, reaction5, status, created_at, updated_at) VALUES ({post.user}, '{post.title}', '{post.body}', '{post.song}', '{post.photo}', {post.bpm}, '{post.scale}', '{post.PaidMethods}', {post.cost}, '{post.licenses}', '{post.tags}', '{post.reaction1}', '{post.reaction2}', '{post.reaction3}', '{post.reaction4}', '{post.reaction5}', {post.status}, '{post.created_at}', '{post.updated_at}')"
