@@ -43,7 +43,7 @@ async def update_post(post_id: int, post: Post):
     return post
 
 # Ruta para eliminar un post por su ID
-@app.delete("/posts/{post_id}", response_model=Post)
+@app.delete("/posts/{post_id}")
 async def delete_post(post_id: int):
     # Llamar a la función para eliminar un post
     delete_post(post_id)
